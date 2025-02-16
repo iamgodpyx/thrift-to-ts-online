@@ -31,7 +31,7 @@ export async function print(
     now.getMonth() + 1
   }-${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
   const content = `// generate${` at ${timeString}`}\n
- /**
+/**
 * @deprecated 该类型可能损失精度，请检查类型是否应该为string
 */
 type Int64 = string\n
