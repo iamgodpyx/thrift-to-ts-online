@@ -11,6 +11,8 @@ import './globals.css'
 const START_THRIFT = `namespace java com.example.thrift
 namespace py example.thrift
 
+const string test = 'test'
+
 // 定义一个枚举类型，表示用户的状态
 enum UserStatus {
     ACTIVE = 0,  // 用户活跃
@@ -106,6 +108,14 @@ struct UserProfile {
     8: optional list<PaymentInfo> payment_history;  // 可选的支付历史
 }
 
+struct MyStruct {
+	1: optional string test
+}
+
+service MyService {
+	void ping()
+}
+
 // 服务接口，定义用户相关操作
 service UserService {
     // 创建新用户
@@ -147,7 +157,8 @@ service ProductService {
     // 获取单个商品详情
     Product getProductDetails(1: required i32 product_id);
 }
-`;
+`
+
 export default function Home() {
   const [thrift, setThrift] = useState(START_THRIFT);
 

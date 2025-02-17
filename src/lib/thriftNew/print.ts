@@ -35,11 +35,11 @@ export async function print(
 * @deprecated 该类型可能损失精度，请检查类型是否应该为string
 */
 type Int64 = string\n
+${printConsts(entity)}
 ${printEnums(entity)}
 ${printInterfaces(entity)}
 ${printTypeDefs(entity)}
 ${printServices(entity)}
-${printConsts(entity)}
 `;
 
   return content;
@@ -135,9 +135,9 @@ export function printConsts(entity: RpcEntity): string {
       datum.type === SyntaxType.I64Keyword ||
       datum.type === SyntaxType.StringKeyword
     ) {
-      rtn += `  export const ${datum.name} = '${datum.value}'\n`;
+      rtn += `export const ${datum.name} = '${datum.value}'\n`;
     } else {
-      rtn += `  export const ${datum.name} = ${datum.value}\n`;
+      rtn += `export const ${datum.name} = ${datum.value}\n`;
     }
   });
   return rtn;
