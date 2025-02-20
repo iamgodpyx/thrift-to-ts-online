@@ -160,7 +160,7 @@ export function printInterfaces(
   let rtn = "";
   entity.interfaces.forEach((datum, _i) => {
     rtn += printComments(datum.commentsBefore);
-    rtn += `  export interface ${datum.name} {
+    rtn += `export interface ${datum.name} {
     ${Object.keys(datum.properties)
       .map((key, i, arr) => {
         const property = datum.properties[key];
@@ -176,12 +176,13 @@ export function printInterfaces(
         return temp;
       })
       .join("\n    ")}
-  }    ${printComments(datum.commentsAfter, datum.loc)}
+}    ${printComments(datum.commentsAfter, datum.loc)}
 
 `;
   });
 
-  return prettier(rtn);
+  // return prettier(rtn);
+  return rtn;
 }
 
 /**
