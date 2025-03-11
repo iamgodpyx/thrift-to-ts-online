@@ -107,6 +107,10 @@ export type KeywordType =
     | SyntaxType.I16Keyword
     | SyntaxType.I32Keyword
     | SyntaxType.I64Keyword
+    | SyntaxType.Int8Keyword
+    | SyntaxType.Int16Keyword
+    | SyntaxType.Int32Keyword
+    | SyntaxType.Int64Keyword
     | SyntaxType.BinaryKeyword
     | SyntaxType.ByteKeyword
 
@@ -423,6 +427,10 @@ export enum SyntaxType {
     I16Keyword = 'I16Keyword',
     I32Keyword = 'I32Keyword',
     I64Keyword = 'I64Keyword',
+    Int8Keyword = 'Int8Keyword',
+    Int16Keyword = 'Int16Keyword',
+    Int32Keyword = 'Int32Keyword',
+    Int64Keyword = 'Int64Keyword',
     ThrowsKeyword = 'ThrowsKeyword',
     VoidKeyword = 'VoidKeyword',
     OnewayKeyword = 'OnewayKeyword',

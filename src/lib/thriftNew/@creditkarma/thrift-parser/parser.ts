@@ -1081,6 +1081,10 @@ export function createParser(
       case SyntaxType.I16Keyword:
       case SyntaxType.I32Keyword:
       case SyntaxType.I64Keyword:
+      case SyntaxType.Int8Keyword:
+      case SyntaxType.Int16Keyword:
+      case SyntaxType.Int32Keyword:
+      case SyntaxType.Int64Keyword:
       case SyntaxType.DoubleKeyword:
         return createKeywordFieldType(
           typeToken.type,

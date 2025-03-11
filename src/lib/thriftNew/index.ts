@@ -209,6 +209,10 @@ function getFieldTypeString(
     [SyntaxType.I16Keyword]: "number",
     [SyntaxType.I32Keyword]: "number",
     [SyntaxType.I64Keyword]: i64Type,
+    [SyntaxType.Int8Keyword]: "number",
+    [SyntaxType.Int16Keyword]: "number",
+    [SyntaxType.Int32Keyword]: "number",
+    [SyntaxType.Int64Keyword]: i64Type,
     [SyntaxType.DoubleKeyword]: "number",
     [SyntaxType.StringKeyword]: "string",
     [SyntaxType.BinaryKeyword]: "any",
@@ -515,6 +519,10 @@ function handleConst(
     constType === SyntaxType.I16Keyword ||
     constType === SyntaxType.I32Keyword ||
     constType === SyntaxType.I64Keyword ||
+    constType === SyntaxType.Int8Keyword ||
+    constType === SyntaxType.Int16Keyword ||
+    constType === SyntaxType.Int32Keyword ||
+    constType === SyntaxType.Int64Keyword ||
     constType === SyntaxType.ByteKeyword
   ) {
     cType = constType;

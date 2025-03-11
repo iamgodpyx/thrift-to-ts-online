@@ -31,8 +31,12 @@ export async function print(
     now.getMonth() + 1
   }-${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
   const content = `// generate${` at ${timeString}`}\n
+/*******************************************************
+ * !!! 警告：此代码为自动生成，请勿手动修改 !!!
+ * !!! 任何手动修改将在下次生成时被覆盖 !!!
+ *******************************************************/\n
 /**
-* @deprecated 该类型可能损失精度，请检查类型是否应该为string
+* @deprecated 强烈不建议使用i64类型，有些语言解析json里面 超过范围 [-(2^53)+1, (2^53)-1] 的数字会出现解析错误的情况，建议使用i32，如果可能超出i32的表示范围，建议使用string类型
 */
 type Int64 = string\n
 ${printConsts(entity)}
@@ -299,7 +303,7 @@ export function printServices(
   ];
   return serviceEntity.reduce((rtn, cur) => {
     rtn += printComments(cur.commentsBefore);
-    rtn += `export interface ${cur.name} {
+    rtn += `export interface Service${cur.name} {
 ${Object.keys(cur.interfaces)
   .map((key) => {
     const i = cur.interfaces[key];
@@ -407,7 +411,7 @@ export function printComments(
       if (comment.type === SyntaxType.CommentBlock) {
         res += printCommentBlock(comment);
         // 注释下面不要换行
-        // res += '\n'
+        res += '\n'
       }
     }
   });
@@ -439,7 +443,10 @@ export function printEnumsObject(includeMap: { [key: string]: RpcEntity }): {
           c.type === SyntaxType.ByteKeyword ||
           c.type === SyntaxType.I8Keyword ||
           c.type === SyntaxType.I16Keyword ||
-          c.type === SyntaxType.I32Keyword
+          c.type === SyntaxType.I32Keyword ||
+          c.type === SyntaxType.Int8Keyword ||
+          c.type === SyntaxType.Int16Keyword ||
+          c.type === SyntaxType.Int32Keyword
         ) {
           parsedValue = parseInt(c.value);
         } else if (c.type === SyntaxType.DoubleKeyword) {

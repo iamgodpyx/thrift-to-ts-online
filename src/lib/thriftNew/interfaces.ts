@@ -44,6 +44,10 @@ export type ConstantEntityType =
   | SyntaxType.I16Keyword
   | SyntaxType.I32Keyword
   | SyntaxType.I64Keyword
+  | SyntaxType.Int8Keyword
+  | SyntaxType.Int16Keyword
+  | SyntaxType.Int32Keyword
+  | SyntaxType.Int64Keyword
   | SyntaxType.StringKeyword;
 export interface ConstantEntity extends PrimarySyntax {
   name: string;
