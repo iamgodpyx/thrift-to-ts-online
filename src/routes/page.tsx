@@ -1,12 +1,19 @@
 import React, { useState } from "react";
-import { Controlled as CodeMirror, UnControlled as CodeMirror2 } from "react-codemirror2";
+import {
+  Controlled as CodeMirror,
+  UnControlled as CodeMirror2,
+} from "react-codemirror2";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/dracula.css"; // 使用 Dracula 主题
 import "codemirror/mode/javascript/javascript"; // 引入 JavaScript 语法高亮
 import { parser } from "@/lib/thriftNew";
 import { print } from "@/lib/thriftNew/print";
 import { prettier } from "@/lib/tools/format";
-import './globals.css'
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import { Button } from "@mui/material";
+
+import "./globals.css";
 
 const START_THRIFT = `namespace java com.example.thrift
 namespace py example.thrift
@@ -157,7 +164,7 @@ service ProductService {
     // 获取单个商品详情
     Product getProductDetails(1: required i32 product_id);
 }
-`
+`;
 
 export default function Home() {
   const [thrift, setThrift] = useState(START_THRIFT);
@@ -177,7 +184,20 @@ export default function Home() {
   };
   return (
     <div className="App flex px-[15px] py-[15px] flex-col">
-      <h1 className="text-[24px] font-600 mb-[10px]">Thrift 转换 Typescript</h1>
+      <Tabs
+        value={0}
+        indicatorColor="secondary"
+        textColor="inherit"
+        aria-label="full width tabs example"
+        sx={{
+          ".MuiTab-root": {
+            textTransform: "none", // 禁用自动大写
+          },
+        }}
+      >
+        <Tab label="Thrift 转换 Typescript" value={0} />
+        <Tab value={1} disabled />
+      </Tabs>
 
       <div className="flex">
         <CodeMirror
@@ -191,16 +211,19 @@ export default function Home() {
             autoCloseBrackets: true, // 自动闭合括号
             matchBrackets: true, // 匹配括号
             showCursorWhenSelecting: true, // 选中时显示光标
+            lineWrapping: true,
           }}
           onBeforeChange={handleChange} // 每次编辑内容变化时更新 state
         />
         <div className="mx-[10px] flex">
-          <button
-            className="h-[30px] w-[50px] rounded-[10%] border border-solid m-auto cursor-pointer"
+          <Button
+            style={{ margin: "auto" }}
+            className="h-[30px]"
+            variant="contained"
             onClick={handleClick}
           >
             转换
-          </button>
+          </Button>
         </div>
 
         <CodeMirror2
@@ -215,10 +238,9 @@ export default function Home() {
             matchBrackets: true, // 匹配括号
             showCursorWhenSelecting: true, // 选中时显示光标
             readOnly: true,
+            lineWrapping: true,
           }}
         />
-
-        {/* <button onClick={() => alert(code)}>查看代码</button> */}
       </div>
     </div>
   );

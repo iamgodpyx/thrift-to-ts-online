@@ -2,4 +2,4 @@
 /// <reference types='@modern-js/runtime/types' />
 /// <reference types='@modern-js/runtime/types/router' />
 
-declare module 'prettier-standalone'
+declare module "prettier-standalone";
