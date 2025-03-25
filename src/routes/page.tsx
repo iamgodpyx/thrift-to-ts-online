@@ -12,6 +12,8 @@ import { prettier } from "@/lib/tools/format";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import { Button } from "@mui/material";
+import Tooltip from "@mui/material/Tooltip";
+import { THRIFT_TIPS } from "./tools/constant";
 
 import "./globals.css";
 
@@ -195,7 +197,9 @@ export default function Home() {
           },
         }}
       >
-        <Tab label="Thrift 转换 Typescript" value={0} />
+        <Tooltip title={THRIFT_TIPS} placement="bottom">
+          <Tab label="Thrift IDL 转 TypeScript" value={0} />
+        </Tooltip>
         <Tab value={1} disabled />
       </Tabs>
 
@@ -222,7 +226,7 @@ export default function Home() {
             variant="contained"
             onClick={handleClick}
           >
-            转换
+            生成
           </Button>
         </div>
 

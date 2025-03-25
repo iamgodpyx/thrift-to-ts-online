@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Controlled as CodeMirror,
   UnControlled as CodeMirror2,
@@ -17,7 +17,14 @@ import {
   START_HTML,
   START_JS_BUNDLE,
   START_SOURCEMAP,
+  THRIFT_TIPS,
+  JS_ESCHECK_TIPS,
+  HTML_ESCHECK_TIPS,
 } from "./constant";
+import Tooltip from "@mui/material/Tooltip";
+import { isHTMLInlineScriptContainES6 } from "@/lib/es6_check/src";
+import sourceMap from "source-map";
+import { validateScript } from "./utils";
 
 import "./index.css";
 
@@ -28,7 +35,7 @@ enum TAB_VALUES {
 }
 
 export default function EsCheck() {
-  const [tabValues, setTabValues] = useState(TAB_VALUES.JS_BUNDLE);
+  const [tabValues, setTabValues] = useState(TAB_VALUES.THRIFT_TO_TS);
   const [thrift, setThrift] = useState(START_THRIFT);
   const [jsBundleCode, setJsBundleCode] = useState(START_JS_BUNDLE);
   const [htmlCode, setHtmlCode] = useState(START_HTML);
@@ -38,9 +45,43 @@ export default function EsCheck() {
   const [jsBundleLogCode, setJsBundleLogCode] = useState("");
   const [htmlLogCode, setHtmlLogCode] = useState("");
 
+  useEffect(() => {
+    // 创建一个 script 标签
+    const script = document.createElement("script");
+    // 指定 unpkg 上的包地址，例如加载 lodash 4.17.21 的完整版（根据实际情况修改）
+    script.src = "https://unpkg.com/source-map@0.7.4/dist/source-map.js";
+    script.async = true;
+    // 将 script 标签添加到 body 中
+    document.body.appendChild(script);
+
+    // 可选：加载完成后的回调
+    script.onload = () => {
+      console.log("脚本加载完成！");
+      (sourceMap.SourceMapConsumer as any).initialize({
+        "lib/mappings.wasm":
+          "https://unpkg.com/source-map@0.7.4/lib/mappings.wasm",
+      });
+      // 此时可以使用该包全局变量（如 lodash 通常挂载在 _ 上）
+    };
+
+    // 清理函数，在组件卸载时移除 script 标签
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []); // 空依赖数组，确保只在挂载和卸载时执行一次
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleChange = (editor: any, data: any, value: any) => {
     setThrift(value);
+  };
+  const handleJsBundleChange = (editor: any, data: any, value: any) => {
+    setJsBundleCode(value);
+  };
+  const handleSourcemapChange = (editor: any, data: any, value: any) => {
+    setSourcemapCode(value);
+  };
+  const handleHtmlChange = (editor: any, data: any, value: any) => {
+    setHtmlCode(value);
   };
 
   const handleClick = async () => {
@@ -48,6 +89,27 @@ export default function EsCheck() {
     const tsCode = await print(ast);
     // const result = await prettier(tsCode);
     setTsCode(tsCode);
+  };
+
+  const hancleJsBundleClick = async () => {
+    const result = await validateScript(jsBundleCode, sourcemapCode);
+    setJsBundleLogCode(result);
+    console.log({ result });
+  };
+
+  const hancleHtmlClick = async () => {
+    const result = await isHTMLInlineScriptContainES6(htmlCode);
+    if (result.ok) {
+      setHtmlLogCode("HTML ESCheck, 通过");
+
+      return true;
+    } else {
+      const errorResult =
+        "HTML ESCheck, 失败\n" +
+        (await prettier(`错误信息: ${JSON.stringify(result.data)}`));
+      setHtmlLogCode(errorResult);
+      return false;
+    }
   };
   return (
     <div className="ESCheck flex px-[15px] py-[15px] flex-col">
@@ -62,21 +124,27 @@ export default function EsCheck() {
           },
         }}
       >
-        <Tab
-          label="Thrift 转换 Typescript"
-          value={TAB_VALUES.THRIFT_TO_TS}
-          onClick={() => setTabValues(TAB_VALUES.THRIFT_TO_TS)}
-        />
-        <Tab
-          label="js bundle esCheck"
-          value={TAB_VALUES.JS_BUNDLE}
-          onClick={() => setTabValues(TAB_VALUES.JS_BUNDLE)}
-        />
-        <Tab
-          label="html esCheck"
-          value={TAB_VALUES.HTML}
-          onClick={() => setTabValues(TAB_VALUES.HTML)}
-        />
+        <Tooltip title={THRIFT_TIPS} placement="bottom">
+          <Tab
+            label="Thrift IDL 转 TypeScript"
+            value={TAB_VALUES.THRIFT_TO_TS}
+            onClick={() => setTabValues(TAB_VALUES.THRIFT_TO_TS)}
+          />
+        </Tooltip>
+        <Tooltip title={JS_ESCHECK_TIPS} placement="bottom">
+          <Tab
+            label="Js Bundle ESCheck"
+            value={TAB_VALUES.JS_BUNDLE}
+            onClick={() => setTabValues(TAB_VALUES.JS_BUNDLE)}
+          />
+        </Tooltip>
+        <Tooltip title={HTML_ESCHECK_TIPS} placement="bottom">
+          <Tab
+            label="HTML ESCheck"
+            value={TAB_VALUES.HTML}
+            onClick={() => setTabValues(TAB_VALUES.HTML)}
+          />
+        </Tooltip>
       </Tabs>
       {tabValues === TAB_VALUES.JS_BUNDLE ? (
         <div className="flex">
@@ -95,7 +163,7 @@ export default function EsCheck() {
                 showCursorWhenSelecting: true, // 选中时显示光标
                 lineWrapping: true,
               }}
-              onBeforeChange={handleChange} // 每次编辑内容变化时更新 state
+              onBeforeChange={handleJsBundleChange} // 每次编辑内容变化时更新 state
             />
             <CodeMirror
               className="CodeMirror-js"
@@ -111,7 +179,7 @@ export default function EsCheck() {
                 showCursorWhenSelecting: true, // 选中时显示光标
                 lineWrapping: true,
               }}
-              onBeforeChange={handleChange} // 每次编辑内容变化时更新 state
+              onBeforeChange={handleSourcemapChange} // 每次编辑内容变化时更新 state
             />
           </div>
           <div className="mx-[10px] flex">
@@ -119,8 +187,9 @@ export default function EsCheck() {
               style={{ margin: "auto" }}
               className="h-[30px]"
               variant="contained"
+              onClick={hancleJsBundleClick}
             >
-              转换
+              检查
             </Button>
           </div>
 
@@ -156,15 +225,16 @@ export default function EsCheck() {
               showCursorWhenSelecting: true, // 选中时显示光标
               lineWrapping: true,
             }}
-            onBeforeChange={handleChange} // 每次编辑内容变化时更新 state
+            onBeforeChange={handleHtmlChange} // 每次编辑内容变化时更新 state
           />
           <div className="mx-[10px] flex">
             <Button
               style={{ margin: "auto" }}
               className="h-[30px]"
               variant="contained"
+              onClick={hancleHtmlClick}
             >
-              转换
+              检查
             </Button>
           </div>
 
@@ -209,7 +279,7 @@ export default function EsCheck() {
               variant="contained"
               onClick={handleClick}
             >
-              转换
+              生成
             </Button>
           </div>
 
