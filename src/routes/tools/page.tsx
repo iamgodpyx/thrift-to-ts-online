@@ -12,6 +12,7 @@ import { prettier } from "@/lib/tools/format";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Button from "@mui/material/Button";
+import Drawer from "@mui/material/Drawer";
 import {
   START_THRIFT,
   START_HTML,
@@ -25,6 +26,7 @@ import Tooltip from "@mui/material/Tooltip";
 import { isHTMLInlineScriptContainES6 } from "@/lib/es6_check/src";
 import sourceMap from "source-map";
 import { validateScript } from "./utils";
+import * as intermock from "intermock";
 
 import "./index.css";
 
@@ -40,6 +42,10 @@ export default function EsCheck() {
   const [jsBundleCode, setJsBundleCode] = useState(START_JS_BUNDLE);
   const [htmlCode, setHtmlCode] = useState(START_HTML);
   const [sourcemapCode, setSourcemapCode] = useState(START_SOURCEMAP);
+
+  const [mockCode, setMockCode] = useState("");
+  const [isMockBtnShow, setIsMockBtnShow] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const [tsCode, setTsCode] = useState("");
   const [jsBundleLogCode, setJsBundleLogCode] = useState("");
@@ -89,6 +95,102 @@ export default function EsCheck() {
     const tsCode = await print(ast);
     // const result = await prettier(tsCode);
     setTsCode(tsCode);
+
+    // 使用 intermock 生成 mock 数据
+    try {
+      // 添加内置类型定义
+      const builtInTypes = `
+type Record<K extends keyof any, T> = {
+  [P in K]: T;
+};
+
+type Partial<T> = {
+  [P in keyof T]?: T[P];
+};
+
+type Required<T> = {
+  [P in keyof T]-?: T[P];
+};
+`;
+
+      // 提取接口名称
+      const interfaceRegex = /export\s+interface\s+(\w+)/g;
+      const interfaces = [];
+      let match;
+      while ((match = interfaceRegex.exec(tsCode)) !== null) {
+        const interfaceName = match[1];
+        // 过滤掉通用类型和服务接口
+        if (
+          !interfaceName.includes("Service") &&
+          !["Record", "Partial", "Required"].includes(interfaceName)
+        ) {
+          interfaces.push(interfaceName);
+        }
+      }
+
+      let mockResults = [];
+
+      for (const interfaceName of interfaces) {
+        try {
+          const mockData = intermock.mock({
+            files: [
+              ["builtins.ts", builtInTypes],
+              ["generated.ts", tsCode],
+            ],
+            interfaces: [interfaceName],
+            output: "string",
+            isOptionalAlwaysEnabled: true,
+            isFixedMode: false,
+          });
+
+          let parsedMock;
+          let interfaceMock;
+
+          // 尝试直接解析 JSON
+          try {
+            parsedMock = JSON.parse(mockData as string);
+            interfaceMock = parsedMock[interfaceName];
+          } catch (jsonError) {
+            // 如果直接解析失败，尝试提取 JSON 部分
+            const mockString = mockData as string;
+            const jsonMatch = mockString.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+              parsedMock = JSON.parse(jsonMatch[0]);
+              interfaceMock = parsedMock[interfaceName];
+            } else {
+              // 如果找不到 JSON，直接使用原始数据
+              interfaceMock = mockString;
+            }
+          }
+
+          if (interfaceMock) {
+            const formattedMock =
+              typeof interfaceMock === "string"
+                ? interfaceMock
+                : JSON.stringify(interfaceMock, null, 2);
+            mockResults.push(`// ${interfaceName} Mock Data\n${formattedMock}`);
+          }
+        } catch (interfaceError: any) {
+          console.warn(`生成 ${interfaceName} mock 数据失败:`, interfaceError);
+          mockResults.push(
+            `// ${interfaceName} Mock Data (生成失败)\n// ${
+              interfaceError?.message || interfaceError
+            }`
+          );
+        }
+      }
+
+      if (mockResults.length > 0) {
+        setMockCode(mockResults.join("\n\n\n\n\n\n\n\n"));
+      } else {
+        setMockCode("// 未找到可生成 mock 数据的接口");
+      }
+    } catch (error) {
+      console.error("生成 mock 数据失败:", error);
+      setMockCode("// 生成 mock 数据失败\n" + JSON.stringify(error, null, 2));
+    }
+
+    setIsMockBtnShow(true);
   };
 
   const hancleJsBundleClick = async () => {
@@ -272,15 +374,24 @@ export default function EsCheck() {
             }}
             onBeforeChange={handleChange} // 每次编辑内容变化时更新 state
           />
-          <div className="mx-[10px] flex">
+          <div className="mx-[10px] flex flex-col justify-center">
             <Button
-              style={{ margin: "auto" }}
-              className="h-[30px]"
+              className="h-[30px] w-[64px]"
               variant="contained"
               onClick={handleClick}
             >
               生成
             </Button>
+            {isMockBtnShow && (
+              <Button
+                className="h-[30px] w-[64px]"
+                style={{ marginTop: 20 }}
+                variant="contained"
+                onClick={() => setDrawerOpen(true)}
+              >
+                mock
+              </Button>
+            )}
           </div>
 
           <CodeMirror2
@@ -300,6 +411,28 @@ export default function EsCheck() {
           />
         </div>
       )}
+      <Drawer
+        anchor={"right"}
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+      >
+        <CodeMirror2
+          className="mock-code"
+          value={mockCode}
+          options={{
+            mode: "javascript", // 设置编辑器模式为 JavaScript
+            theme: "dracula", // 使用 Dracula 主题
+            lineNumbers: true, // 显示行号
+            indentUnit: 2, // 设置缩进空格为 2
+            tabSize: 2, // 设置 Tab 大小为 2
+            autoCloseBrackets: true, // 自动闭合括号
+            matchBrackets: true, // 匹配括号
+            showCursorWhenSelecting: true, // 选中时显示光标
+            readOnly: true,
+            lineWrapping: true,
+          }}
+        />
+      </Drawer>
     </div>
   );
 }

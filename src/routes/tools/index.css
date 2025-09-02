@@ -27,4 +27,12 @@ body {
     width: calc(50vw - 50px);
     height: calc((100vh - 150px - 16px) / 2);
   }
+
+  .mock-code {
+    height: 100%;
+    width: 50vw;
+    .CodeMirror {
+      height: 100%;
+    }
+  }
 }
