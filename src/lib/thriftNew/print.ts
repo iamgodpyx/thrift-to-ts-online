@@ -411,7 +411,7 @@ export function printComments(
       if (comment.type === SyntaxType.CommentBlock) {
         res += printCommentBlock(comment);
         // 注释下面不要换行
-        res += '\n'
+        res += "\n";
       }
     }
   });
@@ -460,12 +460,9 @@ export function printEnumsObject(includeMap: { [key: string]: RpcEntity }): {
   });
   const sortedRes = Object.keys(res)
     .sort()
-    .reduce(
-      (pre, cur) => {
-        pre[cur] = res[cur];
-        return pre;
-      },
-      {} as typeof res
-    );
+    .reduce((pre, cur) => {
+      pre[cur] = res[cur];
+      return pre;
+    }, {} as typeof res);
   return sortedRes;
 }

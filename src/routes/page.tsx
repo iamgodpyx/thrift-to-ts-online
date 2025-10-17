@@ -117,54 +117,97 @@ struct UserProfile {
     8: optional list<PaymentInfo> payment_history;  // 可选的支付历史
 }
 
+// 请求结构体定义（只定义输入参数的封装）
+struct CreateUserRequest {
+    1: required string name;
+    2: required string email;
+}
+
+struct GetUserProfileRequest {
+    1: required i32 user_id;
+}
+
+struct UpdateUserProfileRequest {
+    1: required i32 user_id;
+    2: required UserProfile user_profile;
+}
+
+struct GetUserOrdersRequest {
+    1: required i32 user_id;
+}
+
+struct CreateOrderRequest {
+    1: required i32 user_id;
+    2: required list<i32> product_ids;
+    3: optional double total_amount;
+}
+
+struct GetOrderDetailsRequest {
+    1: required i32 order_id;
+}
+
+struct UpdateOrderStatusRequest {
+    1: required i32 order_id;
+    2: required OrderStatus status;
+}
+
+struct GetProductsRequest {
+    1: required i32 page;
+    2: required i32 page_size;
+}
+
+struct GetProductDetailsRequest {
+    1: required i32 product_id;
+}
+
 struct MyStruct {
-	1: optional string test
+    1: optional string test
 }
 
 service MyService {
-	void ping()
+    void ping()
 }
 
 // 服务接口，定义用户相关操作
 service UserService {
     // 创建新用户
-    void createUser(1: required string name, 2: required string email);
+    void createUser(1: CreateUserRequest request);
 
     // 获取用户资料
-    UserProfile getUserProfile(1: required i32 user_id);
+    UserProfile getUserProfile(1: GetUserProfileRequest request);
 
     // 更新用户资料
-    void updateUserProfile(1: required i32 user_id, 2: required UserProfile user_profile);
+    void updateUserProfile(1: UpdateUserProfileRequest request);
 
     // 获取用户的所有订单
-    list<Order> getUserOrders(1: required i32 user_id);
+    list<Order> getUserOrders(1: GetUserOrdersRequest request);
 
     // 创建一个新的订单
-    void createOrder(1: required i32 user_id, 2: required list<i32> product_ids, 3: required double total_amount);
+    void createOrder(1: CreateOrderRequest request);
 
     // 获取订单详情
-    Order getOrderDetails(1: required i32 order_id);
+    Order getOrderDetails(1: GetOrderDetailsRequest request);
 }
 
 // 服务接口，定义订单相关操作
 service OrderService {
     // 创建新订单
-    void createOrder(1: required i32 user_id, 2: required list<i32> product_ids, 3: required double total_amount);
+    void createOrder(1: CreateOrderRequest request);
 
     // 获取订单信息
-    Order getOrder(1: required i32 order_id);
+    Order getOrder(1: GetOrderDetailsRequest request);
 
     // 更新订单状态
-    void updateOrderStatus(1: required i32 order_id, 2: required OrderStatus status);
+    void updateOrderStatus(1: UpdateOrderStatusRequest request);
 }
 
 // 服务接口，定义商品相关操作
 service ProductService {
     // 获取商品列表
-    list<Product> getProducts(1: required i32 page, 2: required i32 page_size);
+    list<Product> getProducts(1: GetProductsRequest request);
 
     // 获取单个商品详情
-    Product getProductDetails(1: required i32 product_id);
+    Product getProductDetails(1: GetProductDetailsRequest request);
 }
 `;
 
