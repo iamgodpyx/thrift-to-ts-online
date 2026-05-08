@@ -29,6 +29,7 @@ import { validateScript } from "./utils";
 import * as intermock from "intermock";
 
 import "./index.css";
+import "../animations.css";
 
 enum TAB_VALUES {
   THRIFT_TO_TS = 0,
@@ -175,7 +176,7 @@ type Required<T> = {
           mockResults.push(
             `// ${interfaceName} Mock Data (生成失败)\n// ${
               interfaceError?.message || interfaceError
-            }`
+            }`,
           );
         }
       }
@@ -214,7 +215,10 @@ type Required<T> = {
     }
   };
   return (
-    <div className="ESCheck flex px-[15px] py-[15px] flex-col">
+    <div
+      className="ESCheck flex px-[15px] py-[15px] flex-col"
+      style={{ position: "relative", zIndex: 1 }}
+    >
       <Tabs
         value={tabValues}
         indicatorColor="secondary"
@@ -223,6 +227,18 @@ type Required<T> = {
         sx={{
           ".MuiTab-root": {
             textTransform: "none", // 禁用自动大写
+            fontWeight: 600,
+            fontSize: "1rem",
+            letterSpacing: "0.5px",
+            transition: "all 0.3s ease",
+            "&:hover": {
+              color: "#00ffff",
+            },
+          },
+          ".MuiTabs-indicator": {
+            background: "linear-gradient(90deg, #00ffff 0%, #ff6b35 100%)",
+            height: "3px",
+            borderRadius: "2px",
           },
         }}
       >
@@ -249,8 +265,8 @@ type Required<T> = {
         </Tooltip>
       </Tabs>
       {tabValues === TAB_VALUES.JS_BUNDLE ? (
-        <div className="flex">
-          <div className="flex flex-col">
+        <div className="flex" style={{ gap: "20px", marginTop: "20px" }}>
+          <div className="flex flex-col" style={{ gap: "16px" }}>
             <CodeMirror
               className="CodeMirror-js mb-[16px]"
               value={jsBundleCode}
@@ -286,10 +302,27 @@ type Required<T> = {
           </div>
           <div className="mx-[10px] flex">
             <Button
-              style={{ margin: "auto" }}
-              className="h-[30px]"
+              style={{
+                margin: "auto",
+                background: "linear-gradient(135deg, #ff6b35 0%, #ff8c5a 100%)",
+                color: "#0f0f23",
+                fontWeight: 700,
+                letterSpacing: "0.5px",
+                boxShadow: "0 8px 24px rgba(255, 107, 53, 0.3)",
+                border: "none",
+              }}
+              className="h-[40px] w-[80px]"
               variant="contained"
               onClick={hancleJsBundleClick}
+              sx={{
+                "&:hover": {
+                  background:
+                    "linear-gradient(135deg, #ff8c5a 0%, #ff6b35 100%)",
+                  boxShadow: "0 12px 32px rgba(255, 107, 53, 0.5)",
+                  transform: "translateY(-2px)",
+                },
+                transition: "all 0.3s ease",
+              }}
             >
               检查
             </Button>
@@ -313,7 +346,7 @@ type Required<T> = {
           />
         </div>
       ) : tabValues === TAB_VALUES.HTML ? (
-        <div className="flex">
+        <div className="flex" style={{ gap: "20px", marginTop: "20px" }}>
           <CodeMirror
             value={htmlCode}
             options={{
@@ -331,10 +364,27 @@ type Required<T> = {
           />
           <div className="mx-[10px] flex">
             <Button
-              style={{ margin: "auto" }}
-              className="h-[30px]"
+              style={{
+                margin: "auto",
+                background: "linear-gradient(135deg, #ff6b35 0%, #ff8c5a 100%)",
+                color: "#0f0f23",
+                fontWeight: 700,
+                letterSpacing: "0.5px",
+                boxShadow: "0 8px 24px rgba(255, 107, 53, 0.3)",
+                border: "none",
+              }}
+              className="h-[40px] w-[80px]"
               variant="contained"
               onClick={hancleHtmlClick}
+              sx={{
+                "&:hover": {
+                  background:
+                    "linear-gradient(135deg, #ff8c5a 0%, #ff6b35 100%)",
+                  boxShadow: "0 12px 32px rgba(255, 107, 53, 0.5)",
+                  transform: "translateY(-2px)",
+                },
+                transition: "all 0.3s ease",
+              }}
             >
               检查
             </Button>
@@ -358,7 +408,7 @@ type Required<T> = {
           />
         </div>
       ) : (
-        <div className="flex">
+        <div className="flex" style={{ gap: "20px", marginTop: "20px" }}>
           <CodeMirror
             value={thrift}
             options={{
@@ -374,20 +424,57 @@ type Required<T> = {
             }}
             onBeforeChange={handleChange} // 每次编辑内容变化时更新 state
           />
-          <div className="mx-[10px] flex flex-col justify-center">
+          <div
+            className="mx-[10px] flex flex-col justify-center"
+            style={{ gap: "20px" }}
+          >
             <Button
-              className="h-[30px] w-[64px]"
+              style={{
+                background: "linear-gradient(135deg, #00ffff 0%, #00d4ff 100%)",
+                color: "#0f0f23",
+                fontWeight: 700,
+                letterSpacing: "0.5px",
+                boxShadow: "0 8px 24px rgba(0, 255, 255, 0.3)",
+                border: "none",
+              }}
+              className="h-[40px] w-[80px]"
               variant="contained"
               onClick={handleClick}
+              sx={{
+                "&:hover": {
+                  background:
+                    "linear-gradient(135deg, #00d4ff 0%, #00ffff 100%)",
+                  boxShadow: "0 12px 32px rgba(0, 255, 255, 0.5)",
+                  transform: "translateY(-2px)",
+                },
+                transition: "all 0.3s ease",
+              }}
             >
               生成
             </Button>
             {isMockBtnShow && (
               <Button
-                className="h-[30px] w-[64px]"
-                style={{ marginTop: 20 }}
+                style={{
+                  background:
+                    "linear-gradient(135deg, #a855f7 0%, #c084fc 100%)",
+                  color: "#0f0f23",
+                  fontWeight: 700,
+                  letterSpacing: "0.5px",
+                  boxShadow: "0 8px 24px rgba(168, 85, 247, 0.3)",
+                  border: "none",
+                }}
+                className="h-[40px] w-[80px]"
                 variant="contained"
                 onClick={() => setDrawerOpen(true)}
+                sx={{
+                  "&:hover": {
+                    background:
+                      "linear-gradient(135deg, #c084fc 0%, #a855f7 100%)",
+                    boxShadow: "0 12px 32px rgba(168, 85, 247, 0.5)",
+                    transform: "translateY(-2px)",
+                  },
+                  transition: "all 0.3s ease",
+                }}
               >
                 mock
               </Button>
@@ -415,6 +502,14 @@ type Required<T> = {
         anchor={"right"}
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
+        PaperProps={{
+          sx: {
+            background: "linear-gradient(135deg, #0f0f23 0%, #1a1a3e 100%)",
+            backdropFilter: "blur(20px)",
+            borderLeft: "1px solid rgba(255, 255, 255, 0.1)",
+            boxShadow: "-8px 0 32px rgba(0, 0, 0, 0.5)",
+          },
+        }}
       >
         <CodeMirror2
           className="mock-code"

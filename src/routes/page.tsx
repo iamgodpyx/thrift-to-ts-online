@@ -16,6 +16,7 @@ import Tooltip from "@mui/material/Tooltip";
 import { THRIFT_TIPS } from "./tools/constant";
 
 import "./globals.css";
+import "./animations.css";
 
 const START_THRIFT = `namespace java com.example.thrift
 namespace py example.thrift
@@ -228,7 +229,10 @@ export default function Home() {
     setTsCode(tsCode);
   };
   return (
-    <div className="App flex px-[15px] py-[15px] flex-col">
+    <div
+      className="App flex px-[15px] py-[15px] flex-col"
+      style={{ position: "relative", zIndex: 1 }}
+    >
       <Tabs
         value={0}
         indicatorColor="secondary"
@@ -237,6 +241,18 @@ export default function Home() {
         sx={{
           ".MuiTab-root": {
             textTransform: "none", // 禁用自动大写
+            fontWeight: 600,
+            fontSize: "1rem",
+            letterSpacing: "0.5px",
+            transition: "all 0.3s ease",
+            "&:hover": {
+              color: "#00ffff",
+            },
+          },
+          ".MuiTabs-indicator": {
+            background: "linear-gradient(90deg, #00ffff 0%, #ff6b35 100%)",
+            height: "3px",
+            borderRadius: "2px",
           },
         }}
       >
@@ -246,7 +262,7 @@ export default function Home() {
         <Tab value={1} disabled />
       </Tabs>
 
-      <div className="flex">
+      <div className="flex" style={{ gap: "20px", marginTop: "20px" }}>
         <CodeMirror
           value={thrift}
           options={{
@@ -264,10 +280,26 @@ export default function Home() {
         />
         <div className="mx-[10px] flex">
           <Button
-            style={{ margin: "auto" }}
-            className="h-[30px]"
+            style={{
+              margin: "auto",
+              background: "linear-gradient(135deg, #00ffff 0%, #00d4ff 100%)",
+              color: "#0f0f23",
+              fontWeight: 700,
+              letterSpacing: "0.5px",
+              boxShadow: "0 8px 24px rgba(0, 255, 255, 0.3)",
+              border: "none",
+            }}
+            className="h-[40px] w-[80px]"
             variant="contained"
             onClick={handleClick}
+            sx={{
+              "&:hover": {
+                background: "linear-gradient(135deg, #00d4ff 0%, #00ffff 100%)",
+                boxShadow: "0 12px 32px rgba(0, 255, 255, 0.5)",
+                transform: "translateY(-2px)",
+              },
+              transition: "all 0.3s ease",
+            }}
           >
             生成
           </Button>
