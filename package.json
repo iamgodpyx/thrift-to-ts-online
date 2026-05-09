@@ -5,6 +5,7 @@
     "reset": "npx rimraf node_modules ./**/node_modules",
     "dev": "modern dev",
     "build": "modern build",
+    "build:github-pages": "GITHUB_PAGES=true modern build && node scripts/prepare-github-pages.mjs",
     "start": "modern start",
     "serve": "modern serve",
     "new": "modern new",

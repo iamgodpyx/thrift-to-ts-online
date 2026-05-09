@@ -28,6 +28,12 @@ Build the app for production:
 pnpm build
 ```
 
+Build the app for GitHub Pages:
+
+```bash
+pnpm build:github-pages
+```
+
 Preview the production build locally:
 
 ```bash
